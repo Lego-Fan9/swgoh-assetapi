@@ -12,18 +12,21 @@ Start the container with something like this:
 docker pull ghcr.io/lego-fan9/swgoh-assetapi:latest
 docker run --name AssetAPI \
     -d \
-    -restart always \
+    --restart always \
     -p 3300:3300 \
+    --env COMLINK_URL=http://localhost:3200
     ghcr.io/lego-fan9/swgoh-assetapi:latest
 ```
+
+The --env flag is optional, and should point to a comlink instance if used. For more info on that see [AssetVersion](#assetversion)
 
 ## Running without Docker
 
 This tool uses FastAPI with uvicorn so you can do
 ```
-pip install UnityPy httpx python-dotenv protobuf fastapi uvicorn aiofiles
 git clone https://github.com/lego-fan9/swgoh-assetapi
 cd swgoh-assetapi
+pip install -r reqs.txt
 python assetapi.py
 ```
 
