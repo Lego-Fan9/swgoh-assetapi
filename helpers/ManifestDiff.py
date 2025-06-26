@@ -1,18 +1,25 @@
 from typing import Dict, List, Any
 from helpers.TypeHelpers import DiffVersion
 
-def compareManifest(newManifest: List[Dict[str, Any]], 
-                    oldManifest: List[Dict[str, Any]], 
+def compareManifest(newManifestFull: List[Dict[str, Any]], 
+                    oldManifestFull: List[Dict[str, Any]], 
                     type: DiffVersion=DiffVersion.ALL, 
                     prefix: str='None'
                     ) -> List[str]:
+    
+    newManifest: List[Dict[str, Any]] = []
+    oldManifest: List[Dict[str, Any]] = []
+
     if prefix != 'None':
-        for key in range(len(oldManifest)):
-            if oldManifest[key]['prefix'] != prefix:
-                del oldManifest[key]
-        for key in range(len(newManifest)):
-            if newManifest[key]['prefix'] != prefix:
-                del newManifest[key]
+        for key in range(len(oldManifestFull)):
+            if oldManifestFull[key]['prefix'] == prefix:
+                oldManifest.append(oldManifestFull[key])
+        for key in range(len(newManifestFull)):
+            if newManifestFull[key]['prefix'] == prefix:
+                newManifest.append(newManifestFull[key])
+    else:
+        newManifest = newManifestFull
+        oldManifest = oldManifestFull
 
     match type:
         case 1:

@@ -91,7 +91,12 @@ async def assetList(version: int,
             async with aiofiles.open(f'tmp/manifest/manifest_{assetOS}_{version}.json', 'r') as file:
                 content = await file.read()
                 
-                return list(json.loads(content).keys())
+                entries = json.loads(content)
+                response = []
+                for entry in entries:
+                    response.append(entry['name'])
+                    
+                return response
     else:
         logger.debug("Couldn't find manifest or user requested a new one")
 
