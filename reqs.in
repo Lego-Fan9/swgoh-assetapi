@@ -1,0 +1,7 @@
+fastapi
+aiofiles
+python-dotenv
+httpx
+UnityPy
+protobuf
+uvicorn
