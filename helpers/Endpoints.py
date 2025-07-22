@@ -1,4 +1,5 @@
 from fastapi import Response
+from fastapi.responses import FileResponse
 from helpers import Texture2DDecoder, ManifestDecoder, ManifestDiff, Logger
 from helpers.RequestManager import RequestManager
 from helpers.FileLock import GlobalFileLock as FileLock
@@ -179,3 +180,40 @@ async def assetGetDiff(version: int,
             response.append({"error": str(e)})
     
     return response
+
+async def getAssetBundle(bundleName: str,
+                         version: int, 
+                         forceReDownload: bool=False, 
+                         assetOS: AssetOS=AssetOS.WINDOWS
+                         ) -> FileResponse:
+    match assetOS:
+        case 1:
+            bundlePathFormat = 'tmp/bundles/android/{}{}'
+        case 2:
+            bundlePathFormat = 'tmp/bundles/ios/{}{}'
+        case _:
+            bundlePathFormat = 'tmp/bundles/windows/{}{}'
+    
+    match bundleName.split('_')[0]:
+            case 'audio':
+                assetExtension = '.wwpkg'
+            case _:
+                assetExtension = '.bundle'
+
+    bundlePath = bundlePathFormat.format(bundleName, assetExtension)
+
+    if not os.path.isfile(bundlePath) or forceReDownload:
+        logger.debug(f'Downloading {bundleName}{assetExtension}')
+        await RequestManager.getSaveAsset(bundleName + assetExtension, version, bundlePath)
+    
+    async with FileLock.claimFile(os.path.abspath(bundlePath)):
+        async with aiofiles.open(os.path.abspath(bundlePath), "rb") as file:
+            content = await file.read()
+
+    return Response(
+        content=content,
+        media_type="application/octet-stream",
+        headers={
+            "Content-Disposition": f'attachment; filename="{bundleName}{assetExtension}"'
+        }
+    )
