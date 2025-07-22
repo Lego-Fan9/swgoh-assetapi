@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Request, HTTPException, Response, Query
-from fastapi.responses import HTMLResponse, FileResponse
+from fastapi.responses import HTMLResponse
 from helpers import HMACDecoder, Endpoints, FileCleaner, Logger
 from helpers.RequestManager import RequestManager
 from helpers.TypeHelpers import AssetOS, DiffVersion, Swagger
@@ -131,13 +131,13 @@ async def getDiffEndpoint(request: Request,
 
     return await Endpoints.assetGetDiff(versionFinal, diffVersion, forceReDownload, diffType, prefix, assetOS)
 
-@app.get('/Asset/bundle', response_class=FileResponse)
+@app.get('/Asset/bundle')
 async def assetBundleEndpoint(request: Request,
                               bundleName: Annotated[str, Query(description=Swagger.assetNameDesc)],
                               version: Annotated[int, Query(description=Swagger.versionDesc)],
                               forceReDownload: Annotated[bool, Query(description=Swagger.forceReDownloadDesc)]=False,
                               assetOS: Annotated[AssetOS, Query(description=Swagger.assetOSDesc)]=AssetOS.WINDOWS
-                              ) -> FileResponse:
+                              ) -> Response:
     if not HMAC_helper.verifyHMACRequest(request.headers, request.url.path, b'GET'):
         raise HTTPException(status_code=401, detail="Invalid or missing signature and or timestamp")
     

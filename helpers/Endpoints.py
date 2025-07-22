@@ -1,5 +1,4 @@
 from fastapi import Response
-from fastapi.responses import FileResponse
 from helpers import Texture2DDecoder, ManifestDecoder, ManifestDiff, Logger
 from helpers.RequestManager import RequestManager
 from helpers.FileLock import GlobalFileLock as FileLock
