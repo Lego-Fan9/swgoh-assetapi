@@ -184,7 +184,7 @@ async def getAssetBundle(bundleName: str,
                          version: int, 
                          forceReDownload: bool=False, 
                          assetOS: AssetOS=AssetOS.WINDOWS
-                         ) -> FileResponse:
+                         ) -> Response:
     match assetOS:
         case 1:
             bundlePathFormat = 'tmp/bundles/android/{}{}'
