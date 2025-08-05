@@ -16,9 +16,12 @@ def decodeManifest(manifest: bytes) -> List[Dict[str, Any]]:
 
     response: List[Dict[str, Any]] = []
     for record in manifestWorker.records:
-        recordName = [entry.asset_name for entry in record.entries][0]
-        prefix = record.name.split('_')[0]
-        response.append({"name": record.name, "fullname": recordName, "version": record.version, "prefix": prefix})
+        prefixList = record.name.split('_')
+        if len(prefixList) >= 2:
+            prefix = prefixList[0]
+        else:
+            prefix = "NOPREFIX"
+        response.append({"name": record.name, "version": record.version, "prefix": prefix})
         
     return response
 
