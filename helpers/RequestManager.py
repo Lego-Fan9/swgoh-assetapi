@@ -3,6 +3,7 @@ from helpers import Logger
 from helpers.FileLock import GlobalFileLock as FileLock
 from helpers.TypeHelpers import AssetOS
 from typing import Union, Dict, List
+import time
 import aiofiles
 import hashlib
 import httpx
@@ -32,7 +33,7 @@ class request_manager:
             case _:
                 assetOSPath = "/Windows/ETC/"
 
-        url = "https://eaassets-a.akamaihd.net/assetssw.capitalgames.com/PROD/{}{}{}".format(version, assetOSPath, asset)
+        url = "https://eaassets-a.akamaihd.net/assetssw.capitalgames.com/PROD/{}{}{}?callingService=assetapi&cacheBust={}".format(version, assetOSPath, asset, str(time.time() * 1000))
 
         try:
             response = await self.httpClient.get(url)
