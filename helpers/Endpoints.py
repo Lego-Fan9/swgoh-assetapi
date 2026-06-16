@@ -1,4 +1,4 @@
-from fastapi import Response
+from fastapi import Response, HTTPException
 from helpers import Texture2DDecoder, ManifestDecoder, ManifestDiff, Logger
 from helpers.RequestManager import RequestManager
 from helpers.FileLock import GlobalFileLock as FileLock
@@ -34,7 +34,10 @@ async def assetSingle(version: int,
 
     if not os.path.isfile(bundlePath) or forceReDownload:
         logger.debug(f'Downloading {assetName}{assetExtension}')
-        await RequestManager.getSaveAsset(assetName + assetExtension, version, bundlePath)
+        try:
+            await RequestManager.getSaveAsset(assetName + assetExtension, version, bundlePath)
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Internal Server Error: {e}")
 
     image, returnName = await Texture2DDecoder.decodeAsset(bundlePath)
     img_bytes = io.BytesIO()
@@ -72,7 +75,10 @@ async def assetMany(version: int,
         asset_path = assetPath.format(assetName, assetExtension)
         if not os.path.isfile(asset_path) or forceReDownload:
             logger.debug(f'Downloading {assetName}{assetExtension}')
-            await RequestManager.getSaveAsset(assetName+assetExtension, version, asset_path)
+            try:
+                await RequestManager.getSaveAsset(assetName+assetExtension, version, asset_path)
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=f"Internal Server Error: {e}")
 
         try:
             response.append({"assetName": assetName, "assetData": await Texture2DDecoder.decodeManyAssets(asset_path)})
@@ -170,7 +176,10 @@ async def assetGetDiff(version: int,
 
         if not os.path.isfile(asset_path) or forceReDownload:
             logger.debug(f'Downloading {assetName}{assetExtension}')
-            await RequestManager.getSaveAsset(assetName+assetExtension, version, asset_path)
+            try:
+                await RequestManager.getSaveAsset(assetName+assetExtension, version, asset_path)
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=f"Internal Server Error: {e}")
 
         try:
             response.append({"assetName": assetName, "assetData": await Texture2DDecoder.decodeManyAssets(asset_path)})
@@ -203,7 +212,10 @@ async def getAssetBundle(bundleName: str,
 
     if not os.path.isfile(bundlePath) or forceReDownload:
         logger.debug(f'Downloading {bundleName}{assetExtension}')
-        await RequestManager.getSaveAsset(bundleName + assetExtension, version, bundlePath)
+        try:
+            await RequestManager.getSaveAsset(bundleName + assetExtension, version, bundlePath)
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Internal Server Error: {e}")
     
     async with FileLock.claimFile(os.path.abspath(bundlePath)):
         async with aiofiles.open(os.path.abspath(bundlePath), "rb") as file:
